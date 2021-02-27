@@ -9,7 +9,9 @@ serverSocket.listen(5)
 while True: 
     (clientSocket,address) = serverSocket.accept()
     clientSocket.send(f"You are now connenctet to {address}".encode())
-    
-    q = input("write Q to Quit: " )
-    if q=="Q":
-        break
+    msg_back = clientSocket.recv(1024).decode() 
+    print(msg_back)
+
+    #q = input("write Q to Quit: " )
+    #if q=="Q":
+        #break
