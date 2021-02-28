@@ -1,21 +1,33 @@
 import sys
 import socket
-from chatbot import peak_bot
 
-PERSONS = ["Alice", "Bob", "Dora", "Chuck"]
+USER = sys.argv[1]
 
-if len(sys.argv)==1:
-    person = None 
-else:
-    person = sys.argv[1]
+HOST = '192.168.0.33'
+PORT = 6000
+ADDRESS = (HOST,PORT)
+FORMAT = 'utf-8'
+BUFFER_SIZE = 1024
 
-msg_to_send = peak_bot(person)
+DISCONNECT_MSG = "Server: Quit"
 
-clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-clientSocket.connect(('192.168.0.33',1024))
-msg = clientSocket.recv(1024).decode()
-print(msg)
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(ADDRESS)
 
-clientSocket.send(msg_to_send.encode())
+def send_msg(msg):
+    message = msg.encode()
+    client.send(message)
 
+def recv_msg():
+    return client.recv(BUFFER_SIZE).decode(FORMAT)
 
+while True:
+    msg_input = input(f"{USER}: ")
+    msg_to_send = f"{USER}: {msg_input}"
+    send_msg(msg_to_send)
+    recvd_msg = recv_msg()
+    print(recvd_msg)
+    if recvd_msg == DISCONNECT_MSG:
+        break
+
+client.close()
