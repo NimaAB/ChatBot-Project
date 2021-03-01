@@ -1,17 +1,19 @@
 
-
-#First person:
+# First person:
 def alice(action):
     return "Hello I am Alice!"
 
- #second person:
+
+# second person:
 def bob(action):
     return "Hello I am Bob!"
 
-#third person:
+
+# third person:
 def dora(action):
     return "Hello I am Dora!"
 
-#forth person:
+
+# forth person:
 def chuck(action):
     return "Hello I am Chuck!"
