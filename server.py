@@ -11,41 +11,45 @@ ADDRESS = (HOST,PORT)
 
 DISCONNECT_MSG = "Quit"
 
-THREADS = []
-CONNECTIONS = []
+USERS = []
+CLIENTS = []
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDRESS)
+server.listen()
 
-def client_handler(connection,address):
-    print(f"<NEW CONNECTION> {address} connected.")
-    connected = True
-    while connected:
-        msg = connection.recv(BUFFER_SIZE).decode(FORMAT)
-        print(msg)
-        return_msg = input(f"Server: ")
-        if return_msg == DISCONNECT_MSG:
-            connected = False
+def broadcast_msg(message):
+    for client in CLIENTS:
+        client.send(message)
 
-        connection.send(f"Server: {return_msg}".encode(FORMAT))
-    connection.close()
-
-
-
-def start_connection():
-    server.listen()
-    print(f"<LISTENING> Server listening {HOST} ...")
+def client_handler(client):
     while True:
-        conn,addr = server.accept()
-        thread = threading.Thread(target=client_handler,args=(conn,addr))
+        try:
+            msg = client.recv(BUFFER_SIZE)
+            broadcast_msg(msg)
+
+        except:
+            index = CLIENTS.index(client)
+            CLIENTS.remove(index)
+            client.close()
+            username = USERS[index]
+            broadcast_msg(f"{username} has left the chat")
+            USERS.remove(index)
+            break
+
+def receive_msg():
+    while True:
+        client,address = server.accept()
+        print(f"A client with address {address} connected to the server")
+        client.send("USERNAME".encode(FORMAT))
+        username = client.recv(BUFFER_SIZE).decode()
+        USERS.append(username)
+        CLIENTS.append(client)
+        print(f"username of the client is {username}")
+        broadcast_msg(f"{username} joined the chat".encode(FORMAT))
+        client.send("Your are now connected to the server".encode(FORMAT))
+
+        thread = threading.Thread(target=client_handler, args=(client,))
         thread.start()
-        CONNECTIONS.append((conn,addr))
-        THREADS.append(thread)
-        print(f"<ACTIVE CONNECTIONS> {threading.activeCount()-1}")
 
-
-
-print("<STARTING> server is starting ...")
-start_connection()
-
-#for th in THREADS:
-#   th.join()
+print(f"SERVER LISTENING on {ADDRESS} ...")
+receive_msg()

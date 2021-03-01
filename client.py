@@ -1,7 +1,6 @@
 import sys
 import socket
-
-USER = sys.argv[1]
+import threading
 
 HOST = '192.168.0.33'
 PORT = 6000
@@ -10,24 +9,30 @@ FORMAT = 'utf-8'
 BUFFER_SIZE = 1024
 
 DISCONNECT_MSG = "Server: Quit"
-
+USERNAME = input("username: ")
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDRESS)
 
-def send_msg(msg):
-    message = msg.encode()
-    client.send(message)
+def receive_msg():
+    while True:
+        try:
+            msg = client.recv(BUFFER_SIZE).decode(FORMAT)
+            if msg == "USERNAME":
+                client.send(USERNAME.encode(FORMAT))
+            else:
+                print(msg)
+        except:
+            print("SOMETHING FAILED!")
+            client.close()
+            break
 
-def recv_msg():
-    return client.recv(BUFFER_SIZE).decode(FORMAT)
+def write_msg():
+    while True:
+        msg = f"{USERNAME}: {input()}"
+        client.send(msg.encode(FORMAT))
 
-while True:
-    msg_input = input(f"{USER}: ")
-    msg_to_send = f"{USER}: {msg_input}"
-    send_msg(msg_to_send)
-    recvd_msg = recv_msg()
-    print(recvd_msg)
-    if recvd_msg == DISCONNECT_MSG:
-        break
+receive_thread = threading.Thread(target=receive_msg)
+receive_thread.start()
 
-client.close()
+write_thread = threading.Thread(target=write_msg)
+write_thread.start()
