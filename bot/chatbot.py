@@ -1,6 +1,5 @@
-import sys
 import random
-from bots import *
+from bot.bots import *
 
 # Global variables
 ACTIONS = ["drink", "eat", "play", "fight", "steal", "code", "write", "sleep", "swim", "read"]
@@ -16,7 +15,6 @@ def peak_person(person=None):
 
 
 def peak_bot(person=None):
-    person = peak_person(person)
     action = random.choice(ACTIONS)
     switch = {
         "Alice": alice(action),
