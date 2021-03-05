@@ -2,6 +2,7 @@ import time
 import threading
 from models.message import Message
 import json
+import pickle
 """
 def thread_func(nmbr):
     print(f"thread {nmbr}:  starts")
@@ -21,8 +22,23 @@ for j, th in enumerate(thList):
 
 msg = Message("Nima", "Hello", "none", "____")
 print(1, msg)
+ser_msg = pickle.dumps(msg)
+print(ser_msg)
+dser_msg = pickle.loads(ser_msg)
+print(dser_msg)
+msg1 = {
+    "sender": dser_msg.sender,
+    "content": dser_msg.content,
+    "action": dser_msg.action,
+    "action_type": dser_msg.action_type
+}
+print(3, msg1)
+
+print("type of dser_msg: ", type(dser_msg))
+# msg1 = Message(dser_msg["sender"], dser_msg["content"], dser_msg["action"], dser_msg["action_type"])
+# print(2, msg1)
 
 json_msg = json.loads(str(msg))
 msg_fromJSON = Message(json_msg["sender"], json_msg["content"], json_msg["action"], json_msg["action_type"])
-print(2, msg_fromJSON.__str__())
+print(4, msg_fromJSON.__str__())
 

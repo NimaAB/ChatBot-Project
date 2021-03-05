@@ -1,37 +1,38 @@
 import sys  # sys.argv will be afterwards
 import socket
 import threading
+import pickle
+import time
+
+from models.message import Message
+from models.person import Person
+from server_helpers import *
 
 HOST = socket.gethostbyname(socket.gethostname())
 PORT = 6000
 FORMAT = 'utf-8'
 BUFFER_SIZE = 1024
 ADDRESS = (HOST, PORT)
-MAX_USERS = 2
+MAX_USERS = 2  # will changed to 4
 
-DISCONNECT_MSG = "BYE"
-
-usernames = []
-clients = []
+persons = []
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDRESS)
 server.listen(MAX_USERS)
 
 
-def broadcast_msg(message):
-    for client in clients:
-        client.send(message)
-
-
-def client_handler(client):
+def client_handler(connection):
     while True:
         try:
-            msg = client.recv(BUFFER_SIZE)
-            broadcast_msg(msg)
-            print(msg.decode(FORMAT))
+            message = connection.recv(BUFFER_SIZE)
+            deserialized_msg = pickle.loads(message)
+            print(deserialized_msg)
+            broadcast_msg(deserialized_msg, persons)
+            print(f"{deserialized_msg.sender}: {deserialized_msg.content}")
         except:
-            disconnecting(client)
+            # disconnecting(person)
+            connection.close()
             break
 
 
@@ -39,42 +40,30 @@ def receive_msg():
     threads = []
     while True:
         client, address = server.accept()
-        print(f"A client with address {address} connected to the server")
+        client.send(pickle.dumps(Message(sender="Host", content="USERNAME")))
+        username = pickle.loads(client.recv(BUFFER_SIZE)).sender
 
-        client.send("USERNAME".encode(FORMAT))
-        username = client.recv(BUFFER_SIZE).decode()
-        usernames.append(username)
-        clients.append(client)
-        print(f"username of the client is {username}")
-        print(f"The chat waiting for {MAX_USERS - len(clients)} client(s) to begin.")
-        broadcast_msg(f"{username} joined the chat".encode(FORMAT))
-        client.send("Your are now connected to the server".encode(FORMAT))
-        thread = threading.Thread(target=client_handler, args=(client,))
+        person = Person(name=username, address=address, connection=client)
+        persons.append(person)
+        new_conn_alert(person)
+
+        ret_message = Message(sender="Host", content=f"{username} joined the chat")
+        broadcast_msg(ret_message, persons)
+
+        connection_confirmed_msg = Message(sender="Host", content="Your are now connected to the server")
+        send_to_single_client(connection_confirmed_msg, person)
+
+        thread = threading.Thread(target=client_handler, args=(person.connection,))
         threads.append(thread)
-        if len(clients) == MAX_USERS:
+
+        if len(persons) == MAX_USERS:
             for th in threads:
                 th.start()
+                time.sleep(2.0)
         else:
+            print(f"The chat waiting for {MAX_USERS - len(persons)} client(s) to begin.")  # not sure yet
             continue
 
 
-"""
-def send_first_msg():
-    if len(clients) == MAX_USERS:
-        broadcast_msg("Hello everyone!".encode(FORMAT))
-    else:
-        broadcast_msg(f"The server is waiting for {MAX_USERS - len(clients)} more users to join the chat")
-"""
-
 print(f"SERVER LISTENING on {ADDRESS} ...")
 receive_msg()
-
-
-# helper methods:
-def disconnecting(client):
-    index = clients.index(client)
-    clients.remove(client)
-    username = usernames[index]
-    usernames.remove(username)
-    client.close()
-    broadcast_msg(f"{username} has left the chat".encode(FORMAT))
