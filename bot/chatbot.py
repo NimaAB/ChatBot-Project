@@ -3,7 +3,7 @@ from bot.bots import *
 from models.message import Message
 
 # Global variables
-ACTIONS = ["drink", "eat", "play", "fight", "steal", "code", "write", "sleep", "swim", "read"]
+ACTIONS = ["drink", "eat", "play", "fight", "steal", "write", "sleep", "read"]
 BOTS = ["Alice", "Bob", "Dora", "Chuck"]
 
 
@@ -16,7 +16,6 @@ def peak_bot(person=None) -> Message:
     :param person: String
     :return: Message Object
     """
-
     if (person is None) or (person not in BOTS):
         user = random.choice(BOTS)
     else:

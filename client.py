@@ -37,6 +37,7 @@ def receive_msg(connection):
 
 def write_msg(connection):
     for _ in range(1):
+        time.sleep(2.0)
         message = peak_bot(USERNAME)
         serialized_msg = pickle.dumps(message)
         connection.send(serialized_msg)
