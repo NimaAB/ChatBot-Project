@@ -1,4 +1,4 @@
-import sys
+import argparse
 import time
 import socket
 import threading
@@ -6,18 +6,33 @@ import pickle
 from bot.chatbot import *
 from models.message import Message
 
-system_params = sys.argv
-PORT = 6000  # default port
 FORMAT = 'utf-8'
 BUFFER_SIZE = 1024
 
-if len(system_params) <= 1:
-    USERNAME = random.choice(BOTS)
-else:
-    PORT = int(system_params[1])
-    USERNAME = peak_bot(system_params[2]).sender
+parser = argparse.ArgumentParser(description="")
+parser.add_argument('-ip', '--ipaddr', metavar='', type=str, required=True, help='IP-address flag is required')
+parser.add_argument('-p', '--port', metavar='', type=int, help='Port for the connection the default port is 6000')
+parser.add_argument('-bn', '--botname', metavar='', type=str, help='The name of bot which represents a client.\n'
+                                                                   'Choose between those names (Alice, Bob, '
+                                                                   'Dora and Chuck)')
+args = parser.parse_args()
 
-HOST = socket.gethostbyname(socket.gethostname())
+if args.botname:
+    USERNAME = peak_bot(args.botname).sender
+else:
+    USERNAME = random.choice(BOTS)
+
+if args.port:
+    PORT = args.port
+else:
+    PORT = 6000
+
+if args.ipaddr:
+    HOST = args.ipaddr
+else:
+    HOST = socket.gethostbyname(socket.gethostname())
+
+
 ADDRESS = (HOST, PORT)
 
 

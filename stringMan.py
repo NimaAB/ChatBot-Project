@@ -1,11 +1,3 @@
 import random
-
-
-switch = {
-    "good": ["reading", "writing"],
-    "bad": ["fighting", "stealing"]
-}
-
-
-print(random.choice(switch["good"]))
-print(random.choice(switch["bad"]))
+for i in range(1, 2+1):
+    print(i)

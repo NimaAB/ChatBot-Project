@@ -1,15 +1,22 @@
-import sys  # sys.argv will be afterwards
+import argparse
 import socket
 import threading
 import pickle
 import time
-
 from models.message import Message
 from models.person import Person
 from server_helpers import *
 
+parser = argparse.ArgumentParser(description="")
+parser.add_argument('-p', '--port', metavar='', type=int, help='Port for the connection the default port is 6000')
+args = parser.parse_args()
+
 HOST = socket.gethostbyname(socket.gethostname())
-PORT = 6000
+if args.port:
+    PORT = args.port
+else:
+    PORT = 6000
+
 FORMAT = 'utf-8'
 BUFFER_SIZE = 1024
 ADDRESS = (HOST, PORT)
@@ -57,12 +64,14 @@ def receive_msg():
         threads.append(thread)
 
         if len(persons) == MAX_USERS:
-            for th in threads:
-                th.start()
-                time.sleep(2.0)
+            break
         else:
             print(f"The chat waiting for {MAX_USERS - len(persons)} client(s) to begin.")  # not sure yet
             continue
+
+    for th in threads:
+        th.start()
+        time.sleep(4.0)
 
 
 print(f"SERVER LISTENING on {ADDRESS} ...")
