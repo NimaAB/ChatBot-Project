@@ -10,7 +10,7 @@ FORMAT = 'utf-8'
 BUFFER_SIZE = 1024
 
 parser = argparse.ArgumentParser(description="")
-parser.add_argument('-ip', '--ipaddr', metavar='', type=str, required=True, help='IP-address flag is required')
+parser.add_argument('-ip', '--ipaddr', metavar='', type=str, required=False, help='IP-address flag is required')
 parser.add_argument('-p', '--port', metavar='', type=int, help='Port for the connection the default port is 6000')
 parser.add_argument('-bn', '--botname', metavar='', type=str, help='The name of bot which represents a client.\n'
                                                                    'Choose between those names (Alice, Bob, '

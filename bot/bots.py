@@ -4,7 +4,7 @@ import random
 actions = {
     "sport": ["run", "swim", "play"],
     "chill": ["watch", "drink"],
-    "nerd": ["study", "read", "write"],
+    "nerd": ["study", "read", "writ"],
     "bad": ["fight", "steal", "smock"]
 }
 
@@ -18,7 +18,7 @@ def me():
         f"How about {action_and_subject}?",
         f"What do you thing about {action_and_subject} for today?"
     ]
-    return Message(sender="HOST", content=random.choice(contents), action=action, action_type=action_type)
+    return Message(sender="Host", content=random.choice(contents), action=action, action_type=action_type)
 
 
 # A active person, but she likes other activities that include physical activities.

@@ -6,6 +6,7 @@ import time
 from models.message import Message
 from models.person import Person
 from server_helpers import *
+from bot.bots import me
 
 parser = argparse.ArgumentParser(description="")
 parser.add_argument('-p', '--port', metavar='', type=int, help='Port for the connection the default port is 6000')
@@ -20,7 +21,7 @@ else:
 FORMAT = 'utf-8'
 BUFFER_SIZE = 1024
 ADDRESS = (HOST, PORT)
-MAX_USERS = 2  # will changed to 4
+MAX_USERS = 2  # will be changed to 4
 
 persons = []
 
@@ -30,11 +31,12 @@ server.listen(MAX_USERS)
 
 
 def client_handler(connection):
+
     while True:
         try:
             message = connection.recv(BUFFER_SIZE)
             deserialized_msg = pickle.loads(message)
-            print(deserialized_msg)
+            # print(deserialized_msg)
             broadcast_msg(deserialized_msg, persons)
             print(f"{deserialized_msg.sender}: {deserialized_msg.content}")
         except:
@@ -64,6 +66,10 @@ def receive_msg():
         threads.append(thread)
 
         if len(persons) == MAX_USERS:
+            suggested_msg = me()
+            print(f"{suggested_msg.sender}: {suggested_msg.content}")
+            time.sleep(1)
+            broadcast_msg(suggested_msg, persons)
             break
         else:
             print(f"The chat waiting for {MAX_USERS - len(persons)} client(s) to begin.")  # not sure yet
