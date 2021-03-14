@@ -36,7 +36,6 @@ def client_handler(connection):
         try:
             message = connection.recv(BUFFER_SIZE)
             deserialized_msg = pickle.loads(message)
-            # print(deserialized_msg)
             broadcast_msg(deserialized_msg, persons)
             print(f"{deserialized_msg.sender}: {deserialized_msg.content}")
         except:
@@ -56,8 +55,8 @@ def receive_msg():
         persons.append(person)
         new_conn_alert(person)
 
-        ret_message = Message(sender="Host", content=f"{username} joined the chat")
-        broadcast_msg(ret_message, persons)
+        # ret_message = Message(sender="Host", content=f"{username} joined the chat")
+        # broadcast_msg(ret_message, persons)
 
         connection_confirmed_msg = Message(sender="Host", content="Your are now connected to the server")
         send_to_single_client(connection_confirmed_msg, person)
@@ -66,9 +65,9 @@ def receive_msg():
         threads.append(thread)
 
         if len(persons) == MAX_USERS:
+            time.sleep(1)
             suggested_msg = me()
             print(f"{suggested_msg.sender}: {suggested_msg.content}")
-            time.sleep(1)
             broadcast_msg(suggested_msg, persons)
             break
         else:
@@ -77,7 +76,7 @@ def receive_msg():
 
     for th in threads:
         th.start()
-        time.sleep(4.0)
+        time.sleep(2.0)
 
 
 print(f"SERVER LISTENING on {ADDRESS} ...")

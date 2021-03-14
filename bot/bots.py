@@ -1,7 +1,7 @@
 from models.message import Message
 import random
 
-actions = {
+ACTIONS = {
     "sport": ["run", "swim", "play"],
     "chill": ["watch", "drink"],
     "nerd": ["study", "read", "writ"],
@@ -9,25 +9,25 @@ actions = {
 }
 
 
-def me():
+def me() -> Message:
     action_types = ["sport", "chill", "nerd", "bad"]
     action_type = random.choice(action_types)
-    action = random.choice(actions[action_type])
+    action = random.choice(ACTIONS[action_type])
     action_and_subject = adding_subject(action)
     contents = [
         f"How about {action_and_subject}?",
-        f"What do you guys think about {action_and_subject}?",
+        f"What do you folks think about {action_and_subject}?",
         f"{action_and_subject} would be nice to do?"
     ]
-    return Message(sender="Host", content=random.choice(contents), action=action, action_type=action_type)
+    return Message(sender="Host", content=random.choice(contents),
+                   action=action, action_type=action_type, thoughts=None)
 
 
-# A active person, but she likes other activities that include physical activities.
-def alice(message) -> Message:
+def alice(message: Message) -> Message:
     bot_name = "Alice"
     my_action_type = "sport"
     is_interested = is_bot_interested(message.action_type, my_action_type)
-    another_choice = adding_subject(random.choice(actions[my_action_type]))
+    another_choice = adding_subject(random.choice(ACTIONS[my_action_type]))
 
     contents = {
         'interested': [
@@ -49,12 +49,10 @@ def alice(message) -> Message:
     return Message(sender=bot_name, content=content, thoughts=thought)
 
 
-# A chilly guy, that likes watching movies and drinking. In addition, he likes to read and write .
 def bob(message: Message) -> Message:
     bot_name = "Bob"
     my_action_type = "chill"
     is_interested = is_bot_interested(message.action_type, my_action_type)
-    another_choice = adding_subject(random.choice(actions[my_action_type]))
 
     contents = {
         'interested': [
@@ -68,33 +66,35 @@ def bob(message: Message) -> Message:
         'thoughts': [
             f"(I am not interested at all!)",
             f"(I am dont like it, but okay I will join)",
-            f"(Hell yes!)"
+            f"(yeah, i will join!)"
         ]
     }
     content, thought = content_choice(is_interested, contents)
     return Message(sender=bot_name, content=content, thoughts=thought)
 
 
-# The nerdy girl likes everything about school. Her hobbies aside to school is watching movies and reading.
 def dora(message: Message) -> Message:
     bot_name = "Dora"
     my_action_type = "nerd"
     is_interested = is_bot_interested(message.action_type, my_action_type)
-    another_choice = adding_subject(random.choice(actions[my_action_type]))
+    another_choice = adding_subject(random.choice(ACTIONS[my_action_type]))
+
+    my_content = "I am in."
+    if message.action == 'nerd':
+        my_content = f"what a good choice {message.action_and_subject}?! let's go for it."
 
     contents = {
         'interested': [
-            f"",
-            f"{message.action_and_subject}! I can't wait any longer.",
+            my_content,
         ],
         'not_interested': [
-            f"That one isn't fair, I would like {another_choice}",
-            f"I am sorry! But I have some other stuff todo",
+            f"That one isn't fair, I would like {another_choice}.",
+            f"I have lots of homework folks, you have fun.",
         ],
         'thoughts': [
-            f"(I am not interested at all!)",
-            f"(I am dont like it, but okay I will join)",
-            f"(Hell yes!)"
+            "(I have lots of home work todo!)",
+            "(I am dont like it, but okay I will join)",
+            "(Hell yes!)"
         ]
     }
 
@@ -102,26 +102,25 @@ def dora(message: Message) -> Message:
     return Message(sender=bot_name, content=content, thoughts=thought)
 
 
-# The bad boy tries everything, but he favourite activities are the bas stuff.
 def chuck(message: Message) -> Message:
     bot_name = "Chuck"
     my_action_type = "bad"
     is_interested = is_bot_interested(message.action_type, my_action_type)
-    another_choice = adding_subject(random.choice(actions[my_action_type]))
+    another_choice = adding_subject(random.choice(ACTIONS[my_action_type]))
 
     contents = {
         'interested': [
-            f"Yeah, my guys let's go for it!",
-            f"{message.action_and_subject} is so fun guys, let's go!",
+            f"Yeah, my folks let's go for it!",
+            f"{message.action_and_subject} is so fun folks, let's go!",
         ],
         'not_interested': [
             f"That is boring, what about {another_choice}?",
-            f"",
+            f"Sorry! I am not available!",
         ],
         'thoughts': [
             f"({message.action_and_subject} sucks!)",
-            f"({message.action_and_subject} isn't my thing, but okay I will join)",
-            f"(Hell yes!)"
+            f"({message.action_and_subject} isn't my thing, but okay I will join them)",
+            "(Hell yes!)"
         ]
     }
 
@@ -135,7 +134,8 @@ def adding_subject(action: str) -> str:
         'watch': ['movie', 'TV', 'theater'],
         'drink': ['beer', 'tea', 'coffee', 'wine'],
         'study': ['math', 'networking', 'database', 'physics'],
-        # more to come...
+        'writ': ['essay', 'the rapport'],
+        'read': ['novell', 'poem', 'comic book']
     }
     if action in subjects:
         return f"{action}ing {random.choice(subjects[action])}"

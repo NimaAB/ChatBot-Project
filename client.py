@@ -18,7 +18,7 @@ parser.add_argument('-bn', '--botname', metavar='', type=str, help='The name of 
 args = parser.parse_args()
 
 if args.botname:
-    USERNAME = peak_bot(args.botname).sender
+    USERNAME = args.botname
 else:
     USERNAME = random.choice(BOTS)
 
@@ -32,28 +32,31 @@ if args.ipaddr:
 else:
     HOST = socket.gethostbyname(socket.gethostname())
 
-
 ADDRESS = (HOST, PORT)
 
+MSGS_FROM_SERVER = []
 
-def receive_msg(connection):
+
+def receive_msg(connection: socket):
     while True:
         received_msg = connection.recv(BUFFER_SIZE)
-        # print(type(received_msg))
         message: Message = pickle.loads(received_msg)
-        # print(type(message))
-        # print(message.content)
+        # print(message)
 
         if message.content == "USERNAME" and message.sender == "Host":
             connection.send(pickle.dumps(Message(sender=USERNAME)))
+        elif message.sender == 'Host' and message.content != "USERNAME":
+            print(f"{message.sender}: {message.content}")
+            MSGS_FROM_SERVER.append(message)
         else:
             print(f"{message.sender}: {message.content}")
 
 
-def write_msg(connection):
+def write_msg(connection: socket):
     for _ in range(1):
         time.sleep(2.0)
-        message = peak_bot(USERNAME)
+        message = peak_bot(USERNAME, MSGS_FROM_SERVER[0])
+        # MY_MSGS.append(message)
         serialized_msg = pickle.dumps(message)
         connection.send(serialized_msg)
 
