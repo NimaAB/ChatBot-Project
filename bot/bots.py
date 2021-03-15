@@ -67,7 +67,7 @@ def bob(message: Message) -> Message:
         ],
         'thoughts': [
             f"(I am not interested at all!)",
-            f"(I am dont like it, but okay I will join)",
+            f"(I dont like it, but okay I will join)",
             f"(yeah, i will join!)"
         ]
     }
@@ -80,9 +80,6 @@ def dora(message: Message) -> Message:
     my_action_type = "nerd"
     is_interested = is_bot_interested(message.action_type, my_action_type)
     another_choice = adding_subject(random.choice(ACTIONS[my_action_type]))
-
-    if message.action is None:
-        return Message(sender=bot_name, content="OK")
 
     my_content = "I am in."
     if message.action == "nerd":
