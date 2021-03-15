@@ -11,11 +11,11 @@ class Message:
 
     def __str__(self):
         return f"{{ \n" \
-               f"\"sender\" : \"{self.sender}\",\n" \
-               f"\"content\" : \"{self.content}\",\n" \
-               f"\"action\" : \"{self.action}\",\n" \
-               f"\"action_and_subject\" : \"{self.action_and_subject}\",\n" \
-               f"\"action_type\" : \"{self.action_type}\",\n" \
-               f"\"thoughts\" : \"{self.thoughts}\",\n" \
-               f"\"content_type\" : \"{self.content_type}\"" \
+               f"\t\"sender\" : \"{self.sender}\",\n" \
+               f"\t\"content\" : \"{self.content}\",\n" \
+               f"\t\"action\" : \"{self.action}\",\n" \
+               f"\t\"action_and_subject\" : \"{self.action_and_subject}\",\n" \
+               f"\t\"action_type\" : \"{self.action_type}\",\n" \
+               f"\t\"thoughts\" : \"{self.thoughts}\",\n" \
+               f"\t\"content_type\" : \"{self.content_type}\"" \
                f"}}"

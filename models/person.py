@@ -4,12 +4,9 @@ class Person:
         self.address = address
         self.connection = connection
 
-    def set_name(self, name):
-        self.name = name
-
     def __str__(self):
-        return f"{{ " \
-               f"\"sender\" : {self.name}" \
-               f"\"content\" : {self.address}" \
-               f"\"action\" : {self.connection}" \
+        return f"{{\n " \
+               f"\t\"sender\" : \"{self.name}\",\n" \
+               f"\t\"address\" : \"{self.address}\",\n" \
+               f"\t\"connection\" : \"{self.connection}\"\n" \
                f"}}"
