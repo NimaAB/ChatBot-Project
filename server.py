@@ -23,6 +23,10 @@ BUFFER_SIZE = 1024
 ADDRESS = (HOST, PORT)
 MAX_USERS = 2  # will be changed to 4
 
+CONN_CONFIRMATION = Message(sender="Host", content="Your are now connected to the server", message_type="CONNECTION")
+# DISCONNECTING = Message(sender="Host", content="QUIT", message_type="CONNECTION")
+CONNECTING = Message(sender="Host", content="USERNAME", message_type="CONNECTION")
+
 persons = []
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -31,24 +35,18 @@ server.listen(MAX_USERS)
 
 
 def client_handler(connection):
-
     while True:
-        try:
-            message = connection.recv(BUFFER_SIZE)
-            deserialized_msg = pickle.loads(message)
-            broadcast_msg(deserialized_msg, persons)
-            print(f"{deserialized_msg.sender}: {deserialized_msg.content}")
-        except:
-            # disconnecting(person)
-            connection.close()
-            break
+        message = connection.recv(BUFFER_SIZE)
+        deserialized_msg = pickle.loads(message)
+        broadcast_msg(deserialized_msg, persons)
+        print(f"{deserialized_msg.sender}: {deserialized_msg.content}")
 
 
 def receive_msg():
     threads = []
     while True:
         client, address = server.accept()
-        client.send(pickle.dumps(Message(sender="Host", content="USERNAME")))
+        client.send(pickle.dumps(CONNECTING))
         username = pickle.loads(client.recv(BUFFER_SIZE)).sender
 
         person = Person(name=username, address=address, connection=client)
@@ -58,8 +56,7 @@ def receive_msg():
         # ret_message = Message(sender="Host", content=f"{username} joined the chat")
         # broadcast_msg(ret_message, persons)
 
-        connection_confirmed_msg = Message(sender="Host", content="Your are now connected to the server")
-        send_to_single_client(connection_confirmed_msg, person)
+        send_to_single_client(CONN_CONFIRMATION, person)
 
         thread = threading.Thread(target=client_handler, args=(person.connection,))
         threads.append(thread)

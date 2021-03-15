@@ -6,6 +6,7 @@ import pickle
 from bot.chatbot import *
 from models.message import Message
 
+BOTS = ["Alice", "Bob", "Dora", "Chuck"]
 FORMAT = 'utf-8'
 BUFFER_SIZE = 1024
 
@@ -17,10 +18,10 @@ parser.add_argument('-bn', '--botname', metavar='', type=str, help='The name of 
                                                                    'Dora and Chuck)')
 args = parser.parse_args()
 
-if args.botname:
-    USERNAME = args.botname
-else:
+if (not args.botname) or (args.botname not in BOTS):
     USERNAME = random.choice(BOTS)
+else:
+    USERNAME = args.botname
 
 if args.port:
     PORT = args.port
@@ -34,7 +35,7 @@ else:
 
 ADDRESS = (HOST, PORT)
 
-MSGS_FROM_SERVER = []
+RECEIVED_MSGS = []
 
 
 def receive_msg(connection: socket):
@@ -44,21 +45,24 @@ def receive_msg(connection: socket):
         # print(message)
 
         if message.content == "USERNAME" and message.sender == "Host":
-            connection.send(pickle.dumps(Message(sender=USERNAME)))
-        elif message.sender == 'Host' and message.content != "USERNAME":
+            connection.send(pickle.dumps(Message(sender=USERNAME, message_type="CONNECTION")))
+        elif message.message_type == "CONNECTION":
             print(f"{message.sender}: {message.content}")
-            MSGS_FROM_SERVER.append(message)
         else:
+            RECEIVED_MSGS.append(message)
             print(f"{message.sender}: {message.content}")
 
 
 def write_msg(connection: socket):
-    for _ in range(1):
+
+    while True:
         time.sleep(2.0)
-        message = peak_bot(USERNAME, MSGS_FROM_SERVER[0])
-        # MY_MSGS.append(message)
-        serialized_msg = pickle.dumps(message)
-        connection.send(serialized_msg)
+        if len(RECEIVED_MSGS) < 1:
+            continue
+        else:
+            message = peak_bot(USERNAME, RECEIVED_MSGS[len(RECEIVED_MSGS)-1])
+            serialized_msg = pickle.dumps(message)
+            connection.send(serialized_msg)
 
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
