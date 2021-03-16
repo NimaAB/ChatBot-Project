@@ -44,7 +44,8 @@ ADDRESS = (IPADDR, PORT)
 # Message:
 FORMAT = 'utf-8'
 BUFFER_SIZE = 1024
-RECEIVED_MSGS = []
+RECEIVED_MSGS_FROM_SERVER = []
+RECEIVED_MSGS_FROM_BOTS = []
 
 DISCONNECT = Message(sender=USERNAME, content="BYE", content_type="CONNECTION")
 
@@ -56,40 +57,41 @@ def receive_msg(connection: socket):
             message: Message = pickle.loads(received_msg)
             if message.content == "USERNAME" and message.sender == "Host":
                 connection.send(pickle.dumps(Message(sender=USERNAME, content_type="CONNECTION")))
-                print("first if\n", message)
+                print("first if\n")
             elif message.content_type == "CONNECTION":
                 print(f"{message.sender}: {message.content}")
-                print("second if\n", message)
+                print("second if\n")
+            elif message.sender == "Host" and message.content_type == "CHAT":
+                print("third if\n")
+                RECEIVED_MSGS_FROM_SERVER.append(message)
+                print(f"{message.sender}: {message.content}")
             else:
-                print("third if\n", message)
-                RECEIVED_MSGS.append(message)
+                RECEIVED_MSGS_FROM_BOTS.append(message)
+                print("forth if\n")
                 print(f"{message.sender}: {message.content}")
         except OSError as e:
-            print("You are now disconnected")
+            print(e)
             break
 
 
 def write_msg(connection: socket):
-    while True:
-        time.sleep(2.0)
-        if len(RECEIVED_MSGS) < 1:
-            continue
-        elif len(RECEIVED_MSGS) > 2:
-            connection.send(pickle.dumps(DISCONNECT))
-            connection.close()
-            break
-        else:
-            message = peak_bot(USERNAME, RECEIVED_MSGS[len(RECEIVED_MSGS) - 1])
+
+    for _ in range(3):
+        time.sleep(4.0)
+        print(len(RECEIVED_MSGS_FROM_SERVER))
+        if len(RECEIVED_MSGS_FROM_SERVER) == 1:
+            message = peak_bot(USERNAME, RECEIVED_MSGS_FROM_SERVER[0])
             serialized_msg = pickle.dumps(message)
             connection.send(serialized_msg)
 
 
 if __name__ == "__main__":
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect(ADDRESS)
-
-    receive_thread = threading.Thread(target=receive_msg, args=(client,))
-    receive_thread.start()
-
-    write_thread = threading.Thread(target=write_msg, args=(client,))
-    write_thread.start()
+    try:
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect(ADDRESS)
+        receive_thread = threading.Thread(target=receive_msg, args=(client,))
+        receive_thread.start()
+        write_thread = threading.Thread(target=write_msg, args=(client,))
+        write_thread.start()
+    except ConnectionRefusedError:
+        print(f"You can't connect to the chatroom.\n Cause: No server is bind to address:{ADDRESS} not running")

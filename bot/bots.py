@@ -146,7 +146,7 @@ def adding_subject(action: str) -> str:
 
 
 def is_bot_interested(action_type: str, my_action_type: str) -> bool:
-    if action_type is my_action_type:
+    if action_type == my_action_type:
         return True  # The bot is interested in the suggestion
     else:
         return random.choice([True, False, False, False])  # the bot is not sure yet.
