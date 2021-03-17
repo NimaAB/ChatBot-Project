@@ -11,12 +11,8 @@ def pick_bot(name: str, message: Message) -> Message:
     """
     switch = {
         "Alice": alice(message),
-        "alice": alice(message),
         "Bob": bob(message),
-        "bob": bob(message),
         "Dora": dora(message),
-        "dora": dora(message),
         "Chuck": chuck(message),
-        "chuck": chuck(message),
     }
     return switch[name]
