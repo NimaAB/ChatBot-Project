@@ -1,6 +1,10 @@
-import random
-
+from bot.bot_helpers import *  # includes all the helper methods that's used by bots.
 from models.message import Message
+
+"""
+bots.py includes all the bots that will join the chatroom.
+Each bot method is responsible to return a Message object based on their interest.
+"""
 
 ACTIONS = {
     "sport": ["run", "swim", "play"],
@@ -48,8 +52,8 @@ def alice(message: Message) -> Message:
         ]
     }
 
-    content, thought = content_choice(is_interested, contents)
-    return Message(sender=bot_name, content=content, thoughts=thought)
+    content = content_choice(is_interested, contents)
+    return Message(sender=bot_name, content=content)
 
 
 def bob(message: Message) -> Message:
@@ -72,8 +76,8 @@ def bob(message: Message) -> Message:
             "(yeah, i will join!)"
         ]
     }
-    content, thought = content_choice(is_interested, contents)
-    return Message(sender=bot_name, content=content, thoughts=thought)
+    content = content_choice(is_interested, contents)
+    return Message(sender=bot_name, content=content)
 
 
 def dora(message: Message) -> Message:
@@ -101,8 +105,8 @@ def dora(message: Message) -> Message:
         ]
     }
 
-    content, thought = content_choice(is_interested, contents)
-    return Message(sender=bot_name, content=content, thoughts=thought)
+    content = content_choice(is_interested, contents)
+    return Message(sender=bot_name, content=content)
 
 
 def chuck(message: Message) -> Message:
@@ -127,54 +131,5 @@ def chuck(message: Message) -> Message:
         ]
     }
 
-    content, thought = content_choice(is_interested, contents)
-    return Message(sender=bot_name, content=content, thoughts=thought)
-
-
-# Helper methods:
-
-def adding_subject(action: str) -> str:
-    subjects = {
-        "play": ['volleyball', 'football', 'tennis'],
-        "watch": ['movie', 'TV', 'theater'],
-        "drink": ['beer', 'tea', 'coffee', 'wine'],
-        "study": ['math', 'networking', 'database', 'physics'],
-        "write": ['essay', 'the rapport'],
-        "read": ['novell', 'poem', 'comic book']
-    }
-    present_form = change_to_present(action)
-    if action in subjects:
-        return f"{present_form} {random.choice(subjects[action])}"
-    else:
-        return present_form
-
-
-def change_to_present(verb: str) -> str:
-    verbs_that_get_double_consonant = ["run", "swim"]
-    verbs_that_that_miss_e = ["write", "code"]
-
-    if verb in verbs_that_get_double_consonant:
-        last_char_of_verb = verb[-1]
-        return verb + last_char_of_verb + "ing"
-    elif verb in verbs_that_that_miss_e:
-        return verb.replace("e", "ing", 1)
-    else:
-        return verb + "ing"
-
-
-def is_bot_interested(action_type: str, my_action_type: str) -> bool:
-    if action_type == my_action_type:
-        return True  # The bot is interested in the suggestion
-    else:
-        return random.choice([True, False, False, False])  # the bot is not sure yet.
-
-
-def content_choice(is_interested: bool, contents: dict) -> str:
-    if is_interested:
-        content = random.choice(contents['interested'])
-        # thought = contents['thoughts'][2]
-    else:
-        content = random.choice(contents['not_interested'])
-        # thought = random.choice([contents['thoughts'][0], contents['thoughts'][1]])
-
-    return content
+    content = content_choice(is_interested, contents)
+    return Message(sender=bot_name, content=content)

@@ -16,4 +16,6 @@ print(len(persons))
 """
 
 action = random.choice(["work", "play", "eat", "cry", "sleep", "fight"])
-print(action)
+name = "NIMA  hellO HeleleE lEl"
+new_name = name.title()
+print(new_name)

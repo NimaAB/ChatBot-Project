@@ -8,8 +8,9 @@ from models.person import Person
 from server_helpers import *
 from bot.bots import me
 
-
-parser = argparse.ArgumentParser(description="")
+description = "Server.py creates the chatroom on an address and listens for four clients to join." \
+              "\nWhen the queue have all four client then the chat begins."
+parser = argparse.ArgumentParser(description=description)
 parser.add_argument('-p', '--port', metavar='', type=int, help='Port for the connection the default port is 6000')
 args = parser.parse_args()
 
@@ -29,18 +30,21 @@ PORT = args_handler(args)
 ADDRESS = (IPADDR, PORT)
 
 # Global_constants:
-MAX_USERS = 2  # will be changed to 4
+MAX_USERS = 4  # we have four bots to connect
 FORMAT = 'utf-8'
 BUFFER_SIZE = 1024
 
 # Connection information messages:
-CONN_CONFIRMATION = Message(sender="Host", content="Your are now connected to the server", content_type="CONNECTION")
-# DISCONNECTING = Message(sender="Host", content="QUIT", content_type="CONNECTION")
+CONN_CONFIRMATION = Message(sender="Host", content="Your are now connected to the server", content_type="CONN-SUCCEED")
 CONNECTING = Message(sender="Host", content="USERNAME", content_type="CONNECTION")
+DISCONNECTING = Message(sender="Host", content="You are now disconnected from the server", content_type="DISCONNECT")
+CONN_REFUSED = Message(sender="Host", content="The bot_name that you have chosen is already in the chat, please come "
+                                              "back with another name", content_type="CONN_REFUSED")
 
 # Clients that have been connected:
 persons = {}
 threads = {}
+bot_names = []
 
 
 def start_threads():
@@ -56,7 +60,8 @@ def client_handler(connection):
         deserialized_msg = pickle.loads(message)
         if (deserialized_msg.content == "BYE") and (deserialized_msg.content_type == "CONNECTION"):
             person = persons.pop(deserialized_msg.sender)
-
+            send_to_single_client(DISCONNECTING, person)
+            print(person.name, " left the chatroom.")
             time.sleep(2)
             person.connection.close()
             threads.pop(deserialized_msg.sender)
@@ -71,16 +76,20 @@ def receive_msg():
         client, address = server.accept()  # accepting a connection
         client.send(pickle.dumps(CONNECTING))  # sending a connection message to get back the bot_name
         username = pickle.loads(client.recv(BUFFER_SIZE)).sender
-
-        person = Person(name=username, address=address, connection=client)  # creating a Person object
-        persons[username] = person
-        new_conn_alert(person)  # a print out message just for the server
-
-        send_to_single_client(CONN_CONFIRMATION, person)  # sending the connection confirmation back to the client
-
-        # creating new thread for handling the client
-        thread = threading.Thread(target=client_handler, args=(person.connection,))
-        threads[username] = thread  # adding the thread to a dictionary of threads
+        if username not in bot_names:
+            bot_names.append(username)
+            person = Person(name=username, address=address, connection=client)  # creating a Person object
+            persons[username] = person
+            new_conn_alert(person)  # a print out message just for the server
+            send_to_single_client(CONN_CONFIRMATION, person)  # sending the connection confirmation back to the client
+            # creating new thread for handling the client
+            thread = threading.Thread(target=client_handler, args=(person.connection,))
+            threads[username] = thread  # adding the thread to a dictionary of threads
+        else:
+            print(f"bot with name: {username} is already taken, please try another bot_name.")
+            client.send(pickle.dumps(CONN_REFUSED))
+            bot_names.pop(bot_names.index(username))
+            client.close()
 
         # if all the bots are connected, then the chat begins with a suggestion message from the server
         if len(persons) == MAX_USERS:
