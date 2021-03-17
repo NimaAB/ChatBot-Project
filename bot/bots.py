@@ -1,10 +1,11 @@
-from models.message import Message
 import random
 
+from models.message import Message
+
 ACTIONS = {
-    "sport": ["runn", "swimm", "play"],
+    "sport": ["run", "swim", "play"],
     "chill": ["watch", "drink"],
-    "nerd": ["study", "read", "writ"],
+    "nerd": ["study", "read", "write", "code"],
     "bad": ["fight", "steal", "smock"]
 }
 
@@ -66,9 +67,9 @@ def bob(message: Message) -> Message:
             f"{message.action_and_subject} isn't my thing, you have a great time!",
         ],
         'thoughts': [
-            f"(I am not interested at all!)",
-            f"(I dont like it, but okay I will join)",
-            f"(yeah, i will join!)"
+            "(I am not interested at all!)",
+            "(I dont like it, but okay I will join)",
+            "(yeah, i will join!)"
         ]
     }
     content, thought = content_choice(is_interested, contents)
@@ -91,7 +92,7 @@ def dora(message: Message) -> Message:
         ],
         "not_interested": [
             f"That one isn't fair, I would like {another_choice}.",
-            f"I have lots of homework folks, you have fun.",
+            "I have lots of homework folks, you have fun.",
         ],
         "thoughts": [
             "(I have lots of home work todo!)",
@@ -117,7 +118,7 @@ def chuck(message: Message) -> Message:
         ],
         "not_interested": [
             f"That is boring, what about {another_choice}?",
-            f"Sorry! I am not available!",
+            "Sorry! I am not available!",
         ],
         "thoughts": [
             f"({message.action_and_subject} sucks!)",
@@ -130,19 +131,35 @@ def chuck(message: Message) -> Message:
     return Message(sender=bot_name, content=content, thoughts=thought)
 
 
+# Helper methods:
+
 def adding_subject(action: str) -> str:
     subjects = {
         "play": ['volleyball', 'football', 'tennis'],
         "watch": ['movie', 'TV', 'theater'],
         "drink": ['beer', 'tea', 'coffee', 'wine'],
         "study": ['math', 'networking', 'database', 'physics'],
-        "writ": ['essay', 'the rapport'],
+        "write": ['essay', 'the rapport'],
         "read": ['novell', 'poem', 'comic book']
     }
+    present_form = change_to_present(action)
     if action in subjects:
-        return f"{action}ing {random.choice(subjects[action])}"
+        return f"{present_form} {random.choice(subjects[action])}"
     else:
-        return f"{action}ing"
+        return present_form
+
+
+def change_to_present(verb: str) -> str:
+    verbs_that_get_double_consonant = ["run", "swim"]
+    verbs_that_that_miss_e = ["write", "code"]
+
+    if verb in verbs_that_get_double_consonant:
+        last_char_of_verb = verb[-1]
+        return verb + last_char_of_verb + "ing"
+    elif verb in verbs_that_that_miss_e:
+        return verb.replace("e", "ing", 1)
+    else:
+        return verb + "ing"
 
 
 def is_bot_interested(action_type: str, my_action_type: str) -> bool:
@@ -152,12 +169,12 @@ def is_bot_interested(action_type: str, my_action_type: str) -> bool:
         return random.choice([True, False, False, False])  # the bot is not sure yet.
 
 
-def content_choice(is_interested: bool, contents: dict) -> tuple:
+def content_choice(is_interested: bool, contents: dict) -> str:
     if is_interested:
         content = random.choice(contents['interested'])
-        thought = contents['thoughts'][2]
+        # thought = contents['thoughts'][2]
     else:
         content = random.choice(contents['not_interested'])
-        thought = random.choice([contents['thoughts'][0], contents['thoughts'][1]])
+        # thought = random.choice([contents['thoughts'][0], contents['thoughts'][1]])
 
-    return content, thought
+    return content
