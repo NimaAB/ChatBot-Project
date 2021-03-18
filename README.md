@@ -14,7 +14,7 @@ that includes an action(verb). Then, based on the bot's interest in the action t
 - Making it a chating app between real participants.
 
 ## Running the current version:
-*python3 is reqired for running the code.*
+*python3 is required for running the code.*
 cd to the project file
 ```bash
 py server.py --help
