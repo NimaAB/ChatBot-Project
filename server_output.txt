@@ -1,9 +1,0 @@
-SERVER LISTENING on ('127.0.1.1', 6000) ...
-Traceback (most recent call last):
-  File "server.py", line 113, in <module>
-    receive_msg()  # executing the main function of the server
-  File "server.py", line 76, in receive_msg
-    client, address = server.accept()  # accepting a connection
-  File "/usr/lib/python3.8/socket.py", line 292, in accept
-    fd, addr = self._accept()
-KeyboardInterrupt
