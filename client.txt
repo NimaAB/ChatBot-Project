@@ -1,7 +1,0 @@
-Exception ignored in: <module 'threading' from '/usr/lib/python3.8/threading.py'>
-Traceback (most recent call last):
-  File "/usr/lib/python3.8/threading.py", line 1388, in _shutdown
-    lock.acquire()
-KeyboardInterrupt: 
-Host: Your are now connected to the server
-Host: writing the rapport would be nice to do?
