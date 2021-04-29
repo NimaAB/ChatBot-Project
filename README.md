@@ -9,7 +9,7 @@ that includes an action(verb). Then, based on the bot's interest in the action t
 - The server will wait for all four bots to join, then start broadcating messages. 
 - Each client(bot) will wait for the others to join, then strating to write.
 
-## Room for feture improvment:
+## Room for future improvments:
 - Making a web server for the project. 
 - Making it a chating app between real participants.
 
