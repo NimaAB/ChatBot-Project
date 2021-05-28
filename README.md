@@ -20,3 +20,6 @@ cd to the project file
 py server.py --help
 py client.py --help
 ```
+
+### Picture:
+Image of Alex Knight from Pexels
